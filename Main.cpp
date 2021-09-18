@@ -10,24 +10,6 @@
 #include"Texture.h"
 
 
-// Vertices coordinates for some triangles 
-GLfloat verticesTriangle[] =
-{	//				COORDINATES					|		COLORS			//
-	-0.5f, -0.5f * float(sqrt(3)) / 3,     0.0f,	0.8f, 0.3f, 0.02f,	// Lower left corner 0
-	 0.5f, -0.5f * float(sqrt(3)) / 3,     0.0f,	0.8f, 0.3f, 0.02f,	// Lower right corner 1
-	 0.0f,  0.5f * float(sqrt(3)) * 2 / 3, 0.0f,	1.0f, 0.6f, 0.32f,	// Upper corner 2
-	-0.25f, 0.5f * float(sqrt(3)) / 6,     0.0f,	0.9f, 0.45f, 0.17f,	// Inner left 3
-	 0.25f, 0.5f * float(sqrt(3)) / 6,     0.0f,	0.9f, 0.45f, 0.17f,	// Inner right 4
-	 0.0f, -0.5f * float(sqrt(3)) / 3,     0.0f,	0.8f, 0.3f, 0.02f	// Inner bottom 5
-};
-// Indices for vertices order for some triangles
-GLuint indicesTriangle[] =
-{
-	0, 5, 3, // Lower left triangle
-	5, 1, 4, // Lower right triangle
-	3, 4, 2 // Upper triangle
-};
-
 // Vertices coordinates
 GLfloat vertices[] =
 {	//				COORDINATES				|		COLORS			|	TexCoord	//
@@ -45,6 +27,28 @@ GLuint indices[] =
 };
 
 
+// Helper function to initialize a new byte array
+unsigned char* initByteArray(int byteLength, int initValue)
+{
+	if (initValue < 0)
+	{
+		return NULL;
+	}
+	if (initValue > 255)
+	{
+		return NULL;
+	}
+	unsigned char* ptr = new unsigned char[byteLength]();
+	if (initValue > 0)
+	{
+		for (int index = 0; index < byteLength; index++)
+		{
+			ptr[index] = (char)initValue;
+		}
+	}
+	return ptr;
+}
+
 
 int main()
 {
@@ -59,8 +63,8 @@ int main()
 	// So that means we only have the modern functions
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // core contains only modern fcn packages
 
-	// Create a GLFWwindow object of 800 by 800 pixels, naming it "YoutubeOpenGL"
-	GLFWwindow* window = glfwCreateWindow(800, 800, "YoutubeOpenGL", NULL, NULL);
+	// Create a GLFWwindow object of 1000 by 1000 pixels, naming it "FluidSimulation"
+	GLFWwindow* window = glfwCreateWindow(1000, 1000, "FluidSimulation", NULL, NULL);
 	// Error check if the window fails to create
 	if (window == NULL)
 	{
@@ -76,8 +80,8 @@ int main()
 	gladLoadGL();
 
 	// Specify the viewpoint of OpenGL in the Window
-	// In this case the viewpoint goes from x = 0, y = 0, to x = 800, y = 800
-	glViewport(0, 0, 800, 800);
+	// In this case the viewpoint goes from x = 0, y = 0, to x = 1000, y = 1000
+	glViewport(0, 0, 1000, 1000);
 
 	// Generates Shader object using shaders default.vert and default.frag
 	Shader shaderProgram("default.vert", "default.frag");
@@ -104,10 +108,18 @@ int main()
 	GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale");
 
 	// Textures
+	
+	// Texture dataTexture("pop_cat.jpg", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
+	Texture dataTexture(800, 800, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+	dataTexture.texUnit(shaderProgram, "tex0", 0);
 
-	Texture popCat("pop_cat.jpg", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
-	popCat.texUnit(shaderProgram, "tex0", 0);
 
+	// Testing update with texture byte data with glTexSubImage2D
+	unsigned char* newByteArray = initByteArray(800 * 800 * 4, 255);
+	dataTexture.Bind();
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 800, 800, GL_RGBA, GL_UNSIGNED_BYTE, newByteArray);
+	dataTexture.Unbind();
+	
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
@@ -121,7 +133,7 @@ int main()
 		// Assigns a value to the uniform; NOTE: Must always be done after activating the Shader Program
 		glUniform1f(uniID, 0.5f);
 		// Binds texture so that it appears in render
-		popCat.Bind();
+		dataTexture.Bind();
 		// Bind the VAO so OpenGL knows to use it
 		VAO1.Bind();
 		// Draw the triangle using the GL_TRIANGLES primitive
@@ -136,7 +148,7 @@ int main()
 	VAO1.Delete();
 	VBO1.Delete();
 	EBO1.Delete();
-	popCat.Delete();
+	dataTexture.Delete();
 	shaderProgram.Delete();
 	// Delete window before ending the program
 	glfwDestroyWindow(window);
@@ -144,3 +156,7 @@ int main()
 	glfwTerminate();
 	return 0;
 }
+
+
+
+
