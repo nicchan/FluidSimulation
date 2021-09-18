@@ -49,6 +49,13 @@ unsigned char* initByteArray(int byteLength, int initValue)
 	return ptr;
 }
 
+void swapTextureIDs(GLuint& idA, GLuint& idB)
+{
+	GLuint temp = idA;
+	idA = idB;
+	idB = temp;
+}
+
 
 int main()
 {
@@ -85,7 +92,11 @@ int main()
 
 	// Generates Shader object using shaders default.vert and default.frag
 	// TODO: more shadersPrograms...
-	Shader shaderProgram("default.vert", "default.frag");
+	// Testing RTT...
+	Shader shaderProgram("default.vert", "TestRTT.frag");
+	Shader shaderProgramB("default.vert", "default.frag");
+
+
 
 	// Generates Vertex Array Object and binds it
 	VAO VAO1;
@@ -105,42 +116,111 @@ int main()
 	VBO1.Unbind();
 	EBO1.Unbind();
 
-	// Gets ID of uniform called "scale"
-	GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale");
-
-	// Textures
+	/* Textures */
 	
 	// Texture dataTexture("pop_cat.jpg", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
 	Texture dataTexture(800, 800, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 	dataTexture.texUnit(shaderProgram, "tex0", 0);
 
+	// Testing additional Texture for RTT
+	Texture dataTextureB(800, 800, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+	dataTextureB.texUnit(shaderProgramB, "tex0", 0);
+	
+	/* FrameBufferObject (test for RTT) */
+
+	// Create and bind the FrameBuffer
+	unsigned int fb;
+	glGenFramebuffers(1, &fb);
+	glBindFramebuffer(GL_FRAMEBUFFER, fb);
+
+	// Attach the dataTextureB as the first color attachment of fb
+	GLenum attachmentPoint = GL_COLOR_ATTACHMENT0;
+	glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentPoint, GL_TEXTURE_2D, dataTextureB.ID, 0);
+
+	// Ensure FrameBuffer is complete, otherwise clean up and exit
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	{
+		std::cout << "Framebuffer is incomplete." << std::endl;
+		VAO1.Delete();
+		VBO1.Delete();
+		EBO1.Delete();
+		dataTexture.Delete();
+		dataTextureB.Delete();
+		shaderProgram.Delete();
+		shaderProgramB.Delete();
+		return -1;
+	}
+	// unbind fb
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 
 	// Testing update with texture byte data with glTexSubImage2D
-	
-	unsigned char* newByteArray = initByteArray(dataTexture.width * dataTexture.height * 4, 255);
+	unsigned char* newByteArray = initByteArray(dataTexture.width * dataTexture.height * 4, 200);
 	dataTexture.BulkImageRefresh(newByteArray);
 	delete[] newByteArray;
 
+	// Set up time step and timers
+	double prevTime = glfwGetTime();
+	double crntTime = glfwGetTime();
+	double timeStep = 1;
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
 	{
+		/* Simple Timer */
+		crntTime = glfwGetTime();
+		if (crntTime - prevTime < timeStep)
+		{
+			continue;
+		}
+		else
+		{
+			prevTime = crntTime;
+		}
+
+		/* Set scale */
+		// Assigns scale value for shader program
+		shaderProgram.setScale(0.5f);
+		// Assigns scale value for shader program B
+		shaderProgramB.setScale(0.5f);
+		// Bind the VAO so OpenGL knows to use it
+		VAO1.Bind();
+
+		/* First Draw */
+		// Binds fb for first Draw
+		glBindFramebuffer(GL_FRAMEBUFFER, fb);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, dataTextureB.ID, 0);
 		// Specify the color of the background
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		// Clean the back buffer and assign new color (the glClearColor) to it
 		glClear(GL_COLOR_BUFFER_BIT);
 		// Tell OpenGL which Shader Program we want to use
 		shaderProgram.Activate();
-		// Assigns a value to the uniform; NOTE: Must always be done after activating the Shader Program
-		glUniform1f(uniID, 0.5f);
 		// Binds texture so that it appears in render
 		dataTexture.Bind();
-		// Bind the VAO so OpenGL knows to use it
-		VAO1.Bind();
 		// Draw the triangle using the GL_TRIANGLES primitive
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+
+		/* Second Draw*/
+		// Binds default FrameBuffer
+		glBindFramebuffer(GL_FRAMEBUFFER, 0); 
+		// Specify the color of the background
+		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+		// Clean the back buffer and assign new color (the glClearColor) to it
+		glClear(GL_COLOR_BUFFER_BIT);
+		// Tell OpenGL which Shader Program we want to use
+		shaderProgramB.Activate();
+		// Binds texture so that it appears in render
+		dataTextureB.Bind();
+		// Draw the triangle using the GL_TRIANGLES primitive
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
+		// Swap TexA and TexB
+		swapTextureIDs(dataTexture.ID, dataTextureB.ID);
 		// Take care of all GLFW events
 		glfwPollEvents();
 	}
@@ -150,7 +230,9 @@ int main()
 	VBO1.Delete();
 	EBO1.Delete();
 	dataTexture.Delete();
+	dataTextureB.Delete();
 	shaderProgram.Delete();
+	shaderProgramB.Delete();
 	// Delete window before ending the program
 	glfwDestroyWindow(window);
 	// Terminate GLFW before ending the program

@@ -164,6 +164,7 @@
   <ItemGroup>
     <None Include="default.frag" />
     <None Include="default.vert" />
+    <None Include="TestRTT.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="pop_cat.jpg" />

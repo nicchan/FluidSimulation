@@ -3,15 +3,7 @@
 
 Texture::Texture(int widthImg, int heightImg, GLenum texType, GLenum slot, GLenum format, GLenum pixelType)
 {
-	// Assigns the type of the texture to the texture object
-	type = texType;
-	width = widthImg;
-	height = heightImg;
-	// set number of color channel to 4
-	int numColCh = 4;
-	int dataLength = widthImg * heightImg * numColCh;
-	// initialize texture data to zeroes
-	unsigned char *bytes = new unsigned char[dataLength]();
+
 
 	// Generates an OpenGL texture object
 	glGenTextures(1, &ID);
@@ -30,6 +22,17 @@ Texture::Texture(int widthImg, int heightImg, GLenum texType, GLenum slot, GLenu
 	// Extra lines in case you chose to use GL_CLAMP_TO_BORDER
 	// float flatColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
 	// glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, flatColor);
+
+
+	// Assigns the type of the texture to the texture object
+	type = texType;
+	width = widthImg;
+	height = heightImg;
+	// set number of color channel to 4
+	int numColCh = 4;
+	int dataLength = widthImg * heightImg * numColCh;
+	// initialize texture data to zeroes
+	unsigned char* bytes = new unsigned char[dataLength]();
 
 	// Assigns the image to the OpenGL Texture object
 	glTexImage2D(texType, 0, format, widthImg, heightImg, 0, format, pixelType, bytes);

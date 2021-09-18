@@ -23,6 +23,8 @@ class Shader
 		void Activate();
 		// Deletes the Shader Program
 		void Delete();
+		// Assigns scale value
+		void setScale(float scaleValue);
 	private:
 		// checks if the different shaders have compiled properly
 		void compileErrors(unsigned int shader, const char* type);

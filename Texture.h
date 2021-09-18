@@ -16,6 +16,7 @@ class Texture
 		unsigned int height;
 		Texture(int widthImg, int heightImg, GLenum texType, GLenum slot, GLenum format, GLenum pixelType);
 		
+		// TODO: figure out C++ instantiation overloading stuff and clean this up
 		/*
 		Texture(const char* image, GLenum texType, GLenum slot, GLenum format, GLenum pixelType); 
 		*/
