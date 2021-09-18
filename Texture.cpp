@@ -5,7 +5,8 @@ Texture::Texture(int widthImg, int heightImg, GLenum texType, GLenum slot, GLenu
 {
 	// Assigns the type of the texture to the texture object
 	type = texType;
-	
+	width = widthImg;
+	height = heightImg;
 	// set number of color channel to 4
 	int numColCh = 4;
 	int dataLength = widthImg * heightImg * numColCh;
@@ -33,7 +34,7 @@ Texture::Texture(int widthImg, int heightImg, GLenum texType, GLenum slot, GLenu
 	// Assigns the image to the OpenGL Texture object
 	glTexImage2D(texType, 0, format, widthImg, heightImg, 0, format, pixelType, bytes);
 
-	// TODO: check if delete is correct
+	// TODO: check if delete operation is correct
 	delete[] bytes;
 
 	// Unbinds the OpenGL Texture Object so that it can't accidentally be modified
@@ -84,6 +85,9 @@ Texture::Texture(const char* image, GLenum texType, GLenum slot, GLenum format, 
 }
 */
 
+
+
+
 void Texture::texUnit(Shader shader, const char* uniform, GLuint unit)
 {
 	// Gets the location of the uniform
@@ -107,4 +111,12 @@ void Texture::Unbind()
 void Texture::Delete()
 {
 	glDeleteTextures(1, &ID);
+}
+
+// Refresh (replace) entire image with newByteArray
+void Texture::BulkImageRefresh(unsigned char* newByteArray)
+{	// TODO: clean up
+	glBindTexture(type, ID);
+	glTexSubImage2D(type, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, newByteArray);
+	glBindTexture(type, 0);
 }

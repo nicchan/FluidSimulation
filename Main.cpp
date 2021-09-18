@@ -84,6 +84,7 @@ int main()
 	glViewport(0, 0, 1000, 1000);
 
 	// Generates Shader object using shaders default.vert and default.frag
+	// TODO: more shadersPrograms...
 	Shader shaderProgram("default.vert", "default.frag");
 
 	// Generates Vertex Array Object and binds it
@@ -115,11 +116,11 @@ int main()
 
 
 	// Testing update with texture byte data with glTexSubImage2D
-	unsigned char* newByteArray = initByteArray(800 * 800 * 4, 255);
-	dataTexture.Bind();
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 800, 800, GL_RGBA, GL_UNSIGNED_BYTE, newByteArray);
-	dataTexture.Unbind();
 	
+	unsigned char* newByteArray = initByteArray(dataTexture.width * dataTexture.height * 4, 255);
+	dataTexture.BulkImageRefresh(newByteArray);
+	delete[] newByteArray;
+
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
