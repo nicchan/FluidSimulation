@@ -134,7 +134,11 @@ int main()
 	Shader shaderProgram("default.vert", "TestRTT.frag");
 	Shader shaderProgramB("default.vert", "default.frag");
 
-
+	/* Set shader program scale */
+	// Assigns scale value for shader program
+	shaderProgram.setScale(0.5f);
+	// Assigns scale value for shader program B
+	shaderProgramB.setScale(0.5f);
 
 	// Generates Vertex Array Object and binds it
 	VAO VAO1;
@@ -174,7 +178,7 @@ int main()
 	/* Textures */
 	unsigned int textureSize = 800;
 
-	// Texture dataTexture("pop_cat.jpg", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
+	
 	Texture dataTexture(textureSize, textureSize, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 	dataTexture.texUnit(shaderProgram, "tex0", 0);
 
@@ -216,10 +220,13 @@ int main()
 	dataTexture.BulkImageRefresh(newByteArray);
 	delete[] newByteArray;
 
+
+
 	// Set up time step and timers
 	double prevTime = glfwGetTime();
 	double crntTime = glfwGetTime();
-	double timeStep = 1;
+	double timeStep = 0.01;
+	unsigned int countOT = 0;	// counter to track OTs
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
@@ -235,13 +242,6 @@ int main()
 			prevTime = crntTime;
 		}
 
-		/* Set scale */
-		// Assigns scale value for shader program
-		shaderProgram.setScale(0.0f);
-		// Assigns scale value for shader program B
-		shaderProgramB.setScale(0.0f);
-
-
 		/* First Draw */
 		// Bind the VAO so OpenGL knows to use it
 		VAO1.Bind();
@@ -251,9 +251,6 @@ int main()
 		// Binds fb for first Draw
 						//bindFramebufferAndSetViewport(fb, textureSize, textureSize);
 		glBindFramebuffer(GL_FRAMEBUFFER, fb);
-		// Re-attach texture to fb
-		// This is needed otherwise only "two states" will be shown
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, dataTextureB.ID, 0);
 		// Specify the color of the background
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		// Clean the back buffer and assign new color (the glClearColor) to it
@@ -264,7 +261,6 @@ int main()
 		dataTexture.Bind();
 		// Draw the triangle using the GL_TRIANGLES primitive
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
 
 		/* Second Draw*/
 		// Bind the VAO so OpenGL knows to use it
@@ -286,12 +282,23 @@ int main()
 		// Draw the triangle using the GL_TRIANGLES primitive
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-		// Swap the back buffer with the front buffer
+		// Show stuff on screen; Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
 		// Swap TexA and TexB
 		swapTextureIDs(dataTexture.ID, dataTextureB.ID);
+		// Re-attach textureB to fb
+		// This is needed otherwise only "two states" will be shown
+		glBindFramebuffer(GL_FRAMEBUFFER, fb);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, dataTextureB.ID, 0);
 		// Take care of all GLFW events
 		glfwPollEvents();
+		
+		// track for real-time related performance 
+		crntTime = glfwGetTime();
+		if (crntTime - prevTime > timeStep)
+		{
+			countOT++;
+		}
 	}
 
 	// Delete all the objects we've created
@@ -308,6 +315,7 @@ int main()
 	glfwDestroyWindow(window);
 	// Terminate GLFW before ending the program
 	glfwTerminate();
+	std::cout << "OT loop counts " << countOT << std::endl;
 	return 0;
 }
 
