@@ -1,5 +1,6 @@
 #include<iostream>
 #include<Windows.h>
+// TODO: #include<assert.h>
 #include<glad/glad.h>
 #include<GLFW/glfw3.h>
 #include<stb/stb_image.h>
@@ -11,25 +12,31 @@
 #include"Texture.h"
 
 
+// Specify the pixel sizing of the window to be created by glfwCreateWindow
+// TODO: currently only doing square; should make it rectangle with 2 components values being specified 
+unsigned int windowSize = 1000;
+
+// Set texture to have same resolution as the window
+unsigned int textureSize = windowSize;
 
 
 // Vertices coordinates
 GLfloat vertices[] =
-{	//				COORDINATES				|		COLORS			|	TexCoord	//
-				-1.0f, -1.0f, 0.0f,				1.0f, 0.0f, 0.0f,		0.0f, 0.0f,	// Lower left corner 0
-				 1.0f, -1.0f, 0.0f,				1.0f, 1.0f, 1.0f,		1.0f, 0.0f,	// Lower right corner 1
-				-1.0f,  1.0f, 0.0f,				0.0f, 1.0f, 0.0f,		0.0f, 1.0f,	// Upper left corner 2
-				 1.0f,	1.0f, 0.0f,				0.0f, 0.0f, 1.0f,		1.0f, 1.0f	// Upper right corner 3 
+{	//		COORDINATES				|		COLORS			|	normTexCoord	    //
+		-1.0f, -1.0f, 0.0f,				1.0f, 0.0f, 0.0f,		0.0f, 0.0f,			// Lower left corner 0
+		 1.0f, -1.0f, 0.0f,				1.0f, 1.0f, 1.0f,		1.0f, 0.0f,			// Lower right corner 1
+		-1.0f,  1.0f, 0.0f,				0.0f, 1.0f, 0.0f,		0.0f, 1.0f,			// Upper left corner 2
+		 1.0f,	1.0f, 0.0f,				0.0f, 0.0f, 1.0f,		1.0f, 1.0f			// Upper right corner 3 
 };
 
 
 // Canvas placement coordinates at final render
 GLfloat placementVertices[] =
-{	//				COORDINATES				|		COLORS			|	TexCoord	//
-				-0.5f, -0.5f, 0.0f,				1.0f, 0.0f, 0.0f,		0.0f, 0.0f,	// Lower left corner 0
-				 0.5f, -0.5f, 0.0f,				1.0f, 1.0f, 1.0f,		1.0f, 0.0f,	// Lower right corner 1
-				-0.5f,  0.5f, 0.0f,				0.0f, 1.0f, 0.0f,		0.0f, 1.0f,	// Upper left corner 2
-				 0.5f,	0.5f, 0.0f,				0.0f, 0.0f, 1.0f,		1.0f, 1.0f	// Upper right corner 3 
+{	//		COORDINATES				|		COLORS			|	normTexCoord	    //
+		-0.5f, -0.5f, 0.0f,				1.0f, 0.0f, 0.0f,		0.0f, 0.0f,			// Lower left corner 0
+		 0.5f, -0.5f, 0.0f,				1.0f, 1.0f, 1.0f,		1.0f, 0.0f,			// Lower right corner 1
+		-0.5f,  0.5f, 0.0f,				0.0f, 1.0f, 0.0f,		0.0f, 1.0f,			// Upper left corner 2
+		 0.5f,	0.5f, 0.0f,				0.0f, 0.0f, 1.0f,		1.0f, 1.0f			// Upper right corner 3 
 };
 
 
@@ -79,7 +86,7 @@ void swapTextureIDs(GLuint& idA, GLuint& idB)
 	idB = temp;
 }
 
-
+// Not sure if this is needed...
 void bindFramebufferAndSetViewport(GLuint fb, unsigned int width, unsigned int height) 
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, fb);
@@ -88,6 +95,19 @@ void bindFramebufferAndSetViewport(GLuint fb, unsigned int width, unsigned int h
 
 int main()
 {
+
+	// check assumption for data sizing
+	if (sizeof(int) != sizeof(float))
+	{
+		std::cout << "sizeof(int) " << sizeof(int) << " does not equal " << "sizeof(float) " << sizeof(float) << std::endl;
+		return -1;
+	}
+	if (sizeof(unsigned int) != sizeof(float))
+	{
+		std::cout << "sizeof(unsigned int) " << sizeof(unsigned int) << " does not equal " << "sizeof(float) " << sizeof(float) << std::endl;
+		return -1;
+	}
+
 	// Initialize GLFW
 	glfwInit();
 
@@ -99,8 +119,8 @@ int main()
 	// So that means we only have the modern functions
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // core contains only modern fcn packages
 
-	// Create a GLFWwindow object of 1000 by 1000 pixels, naming it "FluidSimulation"
-	GLFWwindow* window = glfwCreateWindow(1000, 1000, "FluidSimulation", NULL, NULL);
+	// Create a GLFWwindow object of x by y pixels, naming it "FluidSimulation"
+	GLFWwindow* window = glfwCreateWindow(windowSize, windowSize, "FluidSimulation", NULL, NULL);
 	// Error check if the window fails to create
 	if (window == NULL)
 	{
@@ -124,9 +144,11 @@ int main()
 	gladLoadGL();
 
 	// Specify the viewpoint of OpenGL in the Window
+	// Tell OpenGL the size of the rendering window so OpenGL knows how we want to display the data and coordinates with respect to the window
 	// In this case the viewpoint goes from x = 0, y = 0, to x = 1000, y = 1000
-	unsigned int canvasSize = 1000;
-	glViewport(0, 0, canvasSize, canvasSize);
+	// The first two parameters of glViewport set the location of the lower left corner of the window. 
+	// The third and fourth parameter set the width and height of the rendering window in pixels, which we set equal to GLFW's window size.
+	glViewport(0, 0, windowSize, windowSize);
 
 	// Generates Shader object using shaders default.vert and default.frag
 	// TODO: more shadersPrograms...
@@ -136,7 +158,7 @@ int main()
 
 	/* Set shader program scale */
 	// Assigns scale value for shader program
-	shaderProgram.setScale(0.5f);
+	shaderProgram.setScale(0.0f);
 	// Assigns scale value for shader program B
 	shaderProgramB.setScale(0.5f);
 
@@ -153,6 +175,8 @@ int main()
 	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
 	VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	VAO1.LinkAttrib(VBO1, 2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	
+
 	// Unbind all to prevent accidentally modifying them
 	VAO1.Unbind();
 	VBO1.Unbind();
@@ -170,14 +194,13 @@ int main()
 	canvasVAO.LinkAttrib(canvasVBO, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
 	canvasVAO.LinkAttrib(canvasVBO, 1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	canvasVAO.LinkAttrib(canvasVBO, 2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+
 	// Unbind all to prevent accidentally modifying them
 	canvasVAO.Unbind();
 	canvasVBO.Unbind();
 	canvasEBO.Unbind();
 
 	/* Textures */
-	unsigned int textureSize = 800;
-
 	
 	Texture dataTexture(textureSize, textureSize, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 	dataTexture.texUnit(shaderProgram, "tex0", 0);
@@ -269,7 +292,7 @@ int main()
 		canvasVBO.Bind();
 		canvasEBO.Bind();
 		// Binds default FrameBuffer
-					//bindFramebufferAndSetViewport(0, canvasSize, canvasSize);
+					//bindFramebufferAndSetViewport(0, windowSize, windowSize);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		// Specify the color of the background
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
