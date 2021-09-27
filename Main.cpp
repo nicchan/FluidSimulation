@@ -17,7 +17,8 @@
 unsigned int windowSize = 1000;
 
 // Set texture to have same resolution as the window
-unsigned int textureSize = windowSize;
+//unsigned int textureSize = windowSize;
+unsigned int textureSize = 5;	// test 5x5
 
 
 // Vertices coordinates
@@ -239,10 +240,11 @@ int main()
 
 
 	// Testing update with texture byte data with glTexSubImage2D
+	/* commented out when testing 5x5
 	unsigned char* newByteArray = initByteArray(dataTexture.width * dataTexture.height * 4, 255);
 	dataTexture.BulkImageRefresh(newByteArray);
 	delete[] newByteArray;
-
+	*/
 
 
 	// Set up time step and timers
@@ -272,8 +274,8 @@ int main()
 		VBO1.Bind();
 		EBO1.Bind();
 		// Binds fb for first Draw
-						//bindFramebufferAndSetViewport(fb, textureSize, textureSize);
-		glBindFramebuffer(GL_FRAMEBUFFER, fb);
+		bindFramebufferAndSetViewport(fb, textureSize, textureSize);
+						//glBindFramebuffer(GL_FRAMEBUFFER, fb);
 		// Specify the color of the background
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		// Clean the back buffer and assign new color (the glClearColor) to it
@@ -292,8 +294,8 @@ int main()
 		canvasVBO.Bind();
 		canvasEBO.Bind();
 		// Binds default FrameBuffer
-					//bindFramebufferAndSetViewport(0, windowSize, windowSize);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		bindFramebufferAndSetViewport(0, windowSize, windowSize);
+					//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		// Specify the color of the background
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		// Clean the back buffer and assign new color (the glClearColor) to it

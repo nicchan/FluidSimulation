@@ -13,9 +13,20 @@ uniform sampler2D tex0;
 void main()
 {
 	
-	vec4 tempColor = texelFetch(tex0, ivec2(gl_FragCoord.xy), 0) + vec4(0.005f, 0.005f, 0.005f, 0.0f);
-	//vec4 tempColor = texture(tex0, nTexCoord) + vec4(0.005f, 0.005f, 0.005f, 0.0f);
+	// testing with 5x5
+	vec4 tempColor = texelFetch(tex0, ivec2(gl_FragCoord.xy), 0);
+	if (gl_FragCoord.xy == vec2(0.5, 0.5))
+	{
+		//tempColor.rgb = vec3(0.5,0.5,0.5);
+		tempColor = texelFetch(tex0, ivec2(2, 3), 0);
+	}
+	FragColor = tempColor;
+	
 
+	//vec4 tempColor = texture(tex0, nTexCoord) + vec4(0.005f, 0.005f, 0.005f, 0.0f);
+	//vec4 tempColor = texture(tex0, nTexCoord);
+	/*
+	vec4 tempColor = texelFetch(tex0, ivec2(gl_FragCoord.xy), 0) + vec4(0.005f, 0.005f, 0.005f, 0.0f);
 	if (tempColor.x <= 1.0f)
 	{
 		FragColor = tempColor;
@@ -24,6 +35,7 @@ void main()
 	{
 		FragColor = vec4(0.0f, 0.0f, 0.0f, tempColor.w);
 	}
-}
+	*/
+}	
 
 

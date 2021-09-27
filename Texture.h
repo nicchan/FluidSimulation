@@ -19,6 +19,7 @@ class Texture
 		// TODO: figure out C++ instantiation overloading stuff and clean this up
 		/*
 		Texture(const char* image, GLenum texType, GLenum slot, GLenum format, GLenum pixelType); 
+		// Example: Texture dataTexture("pop_cat.jpg", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
 		*/
 
 		// Assigns a texture unit to a texture

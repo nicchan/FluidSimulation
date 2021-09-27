@@ -14,8 +14,8 @@ uniform sampler2D tex0;
 void main()
 {
 	
-	FragColor = texelFetch(tex0, ivec2(gl_FragCoord.xy), 0);   
-	//FragColor = texture(tex0, nTexCoord);
+	//FragColor = texelFetch(tex0, ivec2(gl_FragCoord.xy), 0);   
+	FragColor = texture(tex0, nTexCoord);
 	
 
 	/*

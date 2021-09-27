@@ -32,7 +32,23 @@ Texture::Texture(int widthImg, int heightImg, GLenum texType, GLenum slot, GLenu
 	int numColCh = 4;
 	int dataLength = widthImg * heightImg * numColCh;
 	// initialize texture data to zeroes
+	//unsigned char* bytes = new unsigned char[dataLength]();
+
+	// test 5x5 
+	unsigned char temp[] =
+	{
+			255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255,
+			255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255,
+			255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255,
+			255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255,
+			255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255
+	};
 	unsigned char* bytes = new unsigned char[dataLength]();
+	for (int ii = 0; ii < dataLength; ii++) 
+	{
+		bytes[ii] = temp[ii];
+	}
+	
 
 	// Assigns the image to the OpenGL Texture object
 	glTexImage2D(texType, 0, format, widthImg, heightImg, 0, format, pixelType, bytes);
