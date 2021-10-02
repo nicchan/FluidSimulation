@@ -12,6 +12,7 @@ class Texture
 	public:
 		GLuint ID;
 		GLenum type;
+		GLenum slot;
 		unsigned int width;
 		unsigned int height;
 		Texture(int widthImg, int heightImg, GLenum texType, GLenum slot, GLenum format, GLenum pixelType);
@@ -31,7 +32,7 @@ class Texture
 		// Deletes a texture
 		void Delete();
 		// Refresh (replace) entire image with newByteArray
-		void BulkImageRefresh(unsigned char* newByteArray);
+		void BulkImagePlace(unsigned char* newByteArray);
 };
 
 #endif

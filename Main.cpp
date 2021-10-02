@@ -206,6 +206,10 @@ int main()
 	Texture dataTexture(textureSize, textureSize, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 	dataTexture.texUnit(shaderProgram, "tex0", 0);
 
+	// Testing Texture in another tex unit 
+	Texture dataTexture1(textureSize, textureSize, GL_TEXTURE_2D, GL_TEXTURE1, GL_RGBA, GL_UNSIGNED_BYTE);
+	dataTexture.texUnit(shaderProgram, "tex1", 1);
+
 	// Testing additional Texture for RTT
 	Texture dataTextureB(textureSize, textureSize, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 	dataTextureB.texUnit(shaderProgramB, "tex0", 0);
@@ -284,6 +288,7 @@ int main()
 		shaderProgram.Activate();
 		// Binds texture so that it appears in render
 		dataTexture.Bind();
+		dataTexture1.Bind();
 		// Draw the triangle using the GL_TRIANGLES primitive
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 

@@ -9,6 +9,7 @@ in vec2 nTexCoord;
 
 // Gets the texture unit from the main function
 uniform sampler2D tex0;
+uniform sampler2D tex1;
 
 void main()
 {
@@ -20,7 +21,14 @@ void main()
 		//tempColor.rgb = vec3(0.5,0.5,0.5);
 		tempColor = texelFetch(tex0, ivec2(2, 3), 0);
 	}
+	if (gl_FragCoord.xy == vec2(2.5, 2.5))
+	{
+		//tempColor.rgb = vec3(0.5,0.5,0.5);
+		tempColor = texelFetch(tex1, ivec2(0, 0), 0);
+	}
 	FragColor = tempColor;
+
+
 	
 
 	//vec4 tempColor = texture(tex0, nTexCoord) + vec4(0.005f, 0.005f, 0.005f, 0.0f);

@@ -1,14 +1,15 @@
 #include"Texture.h"
 
 
-Texture::Texture(int widthImg, int heightImg, GLenum texType, GLenum slot, GLenum format, GLenum pixelType)
+Texture::Texture(int widthImg, int heightImg, GLenum texType, GLenum texSlot, GLenum format, GLenum pixelType)
 {
 
 
 	// Generates an OpenGL texture object
 	glGenTextures(1, &ID);
-	// Assigns the texture to a Texture Unit
-	glActiveTexture(slot);
+	// Assigns the texture to a Texture Unit (eg. GL_TEXTURE0...)
+	glActiveTexture(texSlot);
+	// Binds texture to a target (eg. GL_TEXTURE_2D, GL_TEXTURE_1D, GL_TEXTURE_CUBE_MAP...)
 	glBindTexture(texType, ID);
 
 	// Configures the type of algorithm that is used to make the image smaller or bigger
@@ -25,6 +26,7 @@ Texture::Texture(int widthImg, int heightImg, GLenum texType, GLenum slot, GLenu
 
 
 	// Assigns the type of the texture to the texture object
+	slot = texSlot;
 	type = texType;
 	width = widthImg;
 	height = heightImg;
@@ -119,6 +121,7 @@ void Texture::texUnit(Shader shader, const char* uniform, GLuint unit)
 
 void Texture::Bind()
 {
+	glActiveTexture(slot);
 	glBindTexture(type, ID);
 }
 
@@ -133,7 +136,7 @@ void Texture::Delete()
 }
 
 // Refresh (replace) entire image with newByteArray
-void Texture::BulkImageRefresh(unsigned char* newByteArray)
+void Texture::BulkImagePlace(unsigned char* newByteArray)
 {	// TODO: clean up
 	glBindTexture(type, ID);
 	glTexSubImage2D(type, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, newByteArray);
