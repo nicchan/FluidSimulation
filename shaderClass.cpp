@@ -76,16 +76,33 @@ void Shader::Delete()
 }
 
 
-// Assigns scale value
-void Shader::setScale(float scaleValue)
+// Assigns uniform values
+void Shader::setUniform1f(float value, const char* uniformName)
 {
 	// Activates Shader Program
 	glUseProgram(ID);
 	// Assigns scale value
-	GLuint uniID = glGetUniformLocation(ID, "scale");
-	glUniform1f(uniID, scaleValue);
+	GLuint uniID = glGetUniformLocation(ID, uniformName);
+	glUniform1f(uniID, value);
 }
 
+void Shader::setUniform2f(float value0, float value1, const char* uniformName)
+{
+	// Activates Shader Program
+	glUseProgram(ID);
+	// Assigns scale value
+	GLuint uniID = glGetUniformLocation(ID, uniformName);
+	glUniform2f(uniID, value0, value1);
+}
+
+void Shader::setUniform3f(float value0, float value1, float value2, const char* uniformName)
+{
+	// Activates Shader Program
+	glUseProgram(ID);
+	// Assigns scale value
+	GLuint uniID = glGetUniformLocation(ID, uniformName);
+	glUniform3f(uniID, value0, value1, value2);
+}
 
 // checks if the different shaders have compiled properly
 void Shader::compileErrors(unsigned int shader, const char* type)

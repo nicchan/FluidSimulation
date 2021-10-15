@@ -23,8 +23,11 @@ class Shader
 		void Activate();
 		// Deletes the Shader Program
 		void Delete();
-		// Assigns scale value
-		void setScale(float scaleValue);
+		// Assigns uniform values
+		void setUniform1f(float value, const char* uniformName);
+		void setUniform2f(float value0, float value1, const char* uniformName);
+		void setUniform3f(float value0, float value1, float value2, const char* uniformName);
+
 	private:
 		// checks if the different shaders have compiled properly
 		void compileErrors(unsigned int shader, const char* type);

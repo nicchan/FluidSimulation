@@ -11,11 +11,12 @@ class Texture
 {
 	public:
 		GLuint ID;
-		GLenum type;
+		GLenum target;
 		GLenum slot;
+		GLenum pixelDataType;
 		unsigned int width;
 		unsigned int height;
-		Texture(int widthImg, int heightImg, GLenum texType, GLenum slot, GLenum format, GLenum pixelType);
+		Texture(int widthImg, int heightImg, GLenum texTarget, GLenum slot, GLenum format, GLenum sizedInternalFormat, GLenum pixelType);
 		
 		// TODO: figure out C++ instantiation overloading stuff and clean this up
 		/*
@@ -24,7 +25,7 @@ class Texture
 		*/
 
 		// Assigns a texture unit to a texture
-		void texUnit(Shader shader, const char* uniform, GLuint unit);
+		void texUnit(Shader &shader, const char* uniform, GLuint unit);
 		// Binds a texture
 		void Bind();
 		// Unbinds a texture
@@ -32,7 +33,7 @@ class Texture
 		// Deletes a texture
 		void Delete();
 		// Refresh (replace) entire image with newByteArray
-		void BulkImagePlace(unsigned char* newByteArray);
+		void BulkImageReplace(void* newByteArray);
 };
 
 #endif

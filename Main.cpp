@@ -159,9 +159,9 @@ int main()
 
 	/* Set shader program scale */
 	// Assigns scale value for shader program
-	shaderProgram.setScale(0.0f);
+	shaderProgram.setUniform1f(0.0f, "scale");
 	// Assigns scale value for shader program B
-	shaderProgramB.setScale(0.5f);
+	shaderProgramB.setUniform1f(0.5f, "scale");
 
 	// Generates Vertex Array Object and binds it
 	VAO VAO1;
@@ -203,15 +203,15 @@ int main()
 
 	/* Textures */
 	
-	Texture dataTexture(textureSize, textureSize, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+	Texture dataTexture(textureSize, textureSize, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 	dataTexture.texUnit(shaderProgram, "tex0", 0);
 
 	// Testing Texture in another tex unit 
-	Texture dataTexture1(textureSize, textureSize, GL_TEXTURE_2D, GL_TEXTURE1, GL_RGBA, GL_UNSIGNED_BYTE);
+	Texture dataTexture1(textureSize, textureSize, GL_TEXTURE_2D, GL_TEXTURE1, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 	dataTexture.texUnit(shaderProgram, "tex1", 1);
 
 	// Testing additional Texture for RTT
-	Texture dataTextureB(textureSize, textureSize, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+	Texture dataTextureB(textureSize, textureSize, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
 	dataTextureB.texUnit(shaderProgramB, "tex0", 0);
 	
 	/* FrameBufferObject (test for RTT) */
@@ -244,11 +244,27 @@ int main()
 
 
 	// Testing update with texture byte data with glTexSubImage2D
-	/* commented out when testing 5x5
+	/* 
 	unsigned char* newByteArray = initByteArray(dataTexture.width * dataTexture.height * 4, 255);
-	dataTexture.BulkImageRefresh(newByteArray);
+	dataTexture.BulkImageReplace(newByteArray);
 	delete[] newByteArray;
 	*/
+	// testing with 5x5
+	unsigned char temp[] =
+	{
+			// row index 0
+			255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255,
+			// row index 1
+			255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255,
+			// row index 2
+			255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255,
+			// row index 3
+			255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255,
+			// row index 4
+			255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255
+	};
+	dataTexture.BulkImageReplace(temp);
+
 
 
 	// Set up time step and timers
@@ -280,8 +296,10 @@ int main()
 		// Binds fb for first Draw
 		bindFramebufferAndSetViewport(fb, textureSize, textureSize);
 						//glBindFramebuffer(GL_FRAMEBUFFER, fb);
+						//glViewport(1, 1, textureSize, textureSize);
 		// Specify the color of the background
-		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+		//glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+		glClearColor(0.12f, 0.13f, 0.17f, 1.0f);
 		// Clean the back buffer and assign new color (the glClearColor) to it
 		glClear(GL_COLOR_BUFFER_BIT);
 		// Tell OpenGL which Shader Program we want to use
@@ -315,6 +333,7 @@ int main()
 		// Show stuff on screen; Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
 		// Swap TexA and TexB
+		std::cout << "dataTexture.ID: " << dataTexture.ID << std::endl;
 		swapTextureIDs(dataTexture.ID, dataTextureB.ID);
 		// Re-attach textureB to fb
 		// This is needed otherwise only "two states" will be shown
