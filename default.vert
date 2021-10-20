@@ -15,12 +15,12 @@ out vec3 color;
 out vec2 nTexCoord;
 
 // Controls the scale of the vertices
-uniform float scale;
+uniform float vertScale;
 
 void main()
 {
 	// Outputs the positions/coordinates of all vertices
-	gl_Position = vec4(aPos.x + aPos.x * scale, aPos.y + aPos.y * scale, aPos.z + aPos.z * scale, 1.0);
+	gl_Position = vec4(aPos.x + aPos.x * vertScale, aPos.y + aPos.y * vertScale, aPos.z + aPos.z * vertScale, 1.0);
 	// Assigns the colors from the Vertex Data to "color"
 	color = aColor;
 	// Assigns texture coordinates from the Vertex Data to "texCoord"

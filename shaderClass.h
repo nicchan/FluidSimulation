@@ -27,10 +27,10 @@ class Shader
 		void setUniform1f(float value, const char* uniformName);
 		void setUniform2f(float value0, float value1, const char* uniformName);
 		void setUniform3f(float value0, float value1, float value2, const char* uniformName);
-
+		void setUniform4f(float value0, float value1, float value2, float value3, const char* uniformName);
 	private:
 		// checks if the different shaders have compiled properly
-		void compileErrors(unsigned int shader, const char* type);
+		bool compileErrors(unsigned int shader, const char* type);
 
 };
 

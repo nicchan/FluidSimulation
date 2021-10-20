@@ -10,7 +10,7 @@
 #include"VBO.h"
 #include"EBO.h"
 #include"Texture.h"
-
+#include"Fluid.h"
 
 
 // Specify the pixel sizing of the window to be created by glfwCreateWindow
@@ -56,8 +56,6 @@ GLuint canvasIndices[] =
 	0, 1, 3, // Lower triangle
 };
 
-
-
 // Helper function to initialize a new byte array
 unsigned char* initByteArray(int byteLength, int initValue)
 {
@@ -80,13 +78,6 @@ unsigned char* initByteArray(int byteLength, int initValue)
 	return ptr;
 }
 
-// Helper function to swap IDs
-void swapTextureIDs(GLuint& idA, GLuint& idB)
-{
-	GLuint temp = idA;
-	idA = idB;
-	idB = temp;
-}
 
 // Not sure if this is needed...
 void bindFramebufferAndSetViewport(GLuint fb, unsigned int width, unsigned int height)
@@ -160,9 +151,13 @@ int testRun()
 
 	/* Set shader program scale */
 	// Assigns scale value for shader program
-	shaderProgram.setUniform1f(0.0f, "scale");
+	shaderProgram.setUniform1f(0.0f, "vertScale");
 	// Assigns scale value for shader program B
-	shaderProgramB.setUniform1f(0.5f, "scale");
+	shaderProgramB.setUniform1f(0.5f, "vertScale");
+
+	// setting vec4 uniform
+	shaderProgram.setUniform4f(1.0f, 1.0f, 1.0f, 1.0f, "myvec");
+	shaderProgram.setUniform4f(0.5f, 0.5f, 0.5f, 0.5f, "myvec2");
 
 	// Generates Vertex Array Object and binds it
 	VAO VAO1;
@@ -204,16 +199,81 @@ int testRun()
 
 	/* Textures */
 
-	Texture dataTexture(textureSize, textureSize, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
+	//Texture dataTexture(textureSize, textureSize, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
+	Texture dataTexture(textureSize, textureSize, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_RGBA32F, GL_FLOAT);
 	dataTexture.texUnit(shaderProgram, "tex0", 0);
 
 	// Testing Texture in another tex unit 
-	Texture dataTexture1(textureSize, textureSize, GL_TEXTURE_2D, GL_TEXTURE1, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
-	dataTexture.texUnit(shaderProgram, "tex1", 1);
+	Texture dataTexture1(textureSize, textureSize, GL_TEXTURE_2D, GL_TEXTURE1, GL_RGBA, GL_RGBA32F, GL_FLOAT);
+	dataTexture1.texUnit(shaderProgram, "tex1", 1);
 
 	// Testing additional Texture for RTT
-	Texture dataTextureB(textureSize, textureSize, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
+	Texture dataTextureB(textureSize, textureSize, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_RGBA32F, GL_FLOAT);
+	//Texture dataTextureB(textureSize, textureSize, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_RGBA32F, GL_FLOAT);
 	dataTextureB.texUnit(shaderProgramB, "tex0", 0);
+
+
+	//Trying to understand texture unit slots...
+	std::cout << "\n" << "GL_TEXTURE0: " << GL_TEXTURE0 << "\n" << std::endl;
+	std::cout << "\n" << "GL_TEXTURE1: " << GL_TEXTURE1 << "\n" << std::endl;
+	std::cout << "\n" << "GL_TEXTURE2: " << GL_TEXTURE2 << "\n" << std::endl;
+	std::cout << "\n" << "GL_TEXTURE3: " << GL_TEXTURE3 << "\n" << std::endl;
+
+
+	// Testing update with texture byte data with glTexSubImage2D
+	/*
+	unsigned char* newByteArray = initByteArray(dataTexture.width * dataTexture.height * 4, 255);
+	dataTexture.BulkImageReplace(newByteArray);
+	delete[] newByteArray;
+	*/
+	// testing with 5x5
+	//unsigned char temp[] =
+	//{
+	//	// row index 0
+	//	255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255,
+	//	// row index 1
+	//	255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255,
+	//	// row index 2
+	//	255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255,
+	//	// row index 3
+	//	255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255,
+	//	// row index 4
+	//	255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255
+	//};
+	float temp[] =
+	{
+		// row index 0
+		255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255,
+		// row index 1
+		255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255,
+		// row index 2
+		255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255,
+		// row index 3
+		255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255,
+		// row index 4
+		255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255
+	};
+	dataTexture.BulkImageReplace(temp);
+
+
+	//float temp1[] =
+	//{
+	//	// row index 0
+	//	-1, 0, 0, -1.0,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255,
+	//	// row index 1
+	//	255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255,
+	//	// row index 2
+	//	255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255,
+	//	// row index 3
+	//	255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255,
+	//	// row index 4
+	//	255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255
+	//};
+	float* temp1 = createBoundaryOffsetData(textureSize, textureSize, 4);
+	dataTexture1.BulkImageReplace(temp1);
+	delete[] temp1;
+
+
 
 	/* FrameBufferObject (test for RTT) */
 
@@ -243,28 +303,6 @@ int testRun()
 	// unbind fb
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-
-	// Testing update with texture byte data with glTexSubImage2D
-	/*
-	unsigned char* newByteArray = initByteArray(dataTexture.width * dataTexture.height * 4, 255);
-	dataTexture.BulkImageReplace(newByteArray);
-	delete[] newByteArray;
-	*/
-	// testing with 5x5
-	unsigned char temp[] =
-	{
-		// row index 0
-		255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255,
-		// row index 1
-		255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255,
-		// row index 2
-		255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255,
-		// row index 3
-		255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255,
-		// row index 4
-		255, 0, 0, 255,		0, 255, 0, 255,	   0, 0, 255, 255,	   0, 0, 0, 255,	   255, 255, 255, 255
-	};
-	dataTexture.BulkImageReplace(temp);
 
 
 
@@ -334,7 +372,7 @@ int testRun()
 		// Show stuff on screen; Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
 		// Swap TexA and TexB
-		std::cout << "dataTexture.ID: " << dataTexture.ID << std::endl;
+		//std::cout << "dataTexture.ID: " << dataTexture.ID << std::endl;
 		swapTextureIDs(dataTexture.ID, dataTextureB.ID);
 		// Re-attach textureB to fb
 		// This is needed otherwise only "two states" will be shown

@@ -28,7 +28,6 @@ Shader::Shader(const char* vertexFile, const char* fragmentFile)
 	const char* vertexSource = vertexCode.c_str();
 	const char* fragmentSource = fragmentCode.c_str();
 
-
 	// Create Vertex Shader Object and get its reference
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	// Attach Vertex Shader source to the Vertex Shader Object
@@ -45,8 +44,10 @@ Shader::Shader(const char* vertexFile, const char* fragmentFile)
 	// Compile the Fragment Shader into machine code
 	glCompileShader(fragmentShader);
 	// Checks if Shader compiled successfully
-	compileErrors(fragmentShader, "FRAGMENT");
-
+	if (compileErrors(fragmentShader, "FRAGMENT"))
+	{
+		std::cout << "SHADER_COMPILATION_ERROR for: " << fragmentFile << "\n" << std::endl;
+	}
 	// Create Shader Program Object and get its reference
 	ID = glCreateProgram();
 	// Attach the Vertex and Fragment Shaders to the Shader Program
@@ -55,12 +56,21 @@ Shader::Shader(const char* vertexFile, const char* fragmentFile)
 	// Wrap-up/Link all the shaders together into the Shader Program
 	glLinkProgram(ID);
 	// Checks if Shaders linked successfully
-	compileErrors(ID, "PROGRAM");
-
+	if (compileErrors(ID, "PROGRAM"))
+	{
+		std::cout << "SHADER_LINKING_ERROR for: " << vertexFile << " and " << fragmentFile << "\n" << std::endl;
+	}
 	// Delete the now useless Vertex and Fragment Shader objects
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
-
+	std::cout << "Shader Program ID " << ID << ": " << vertexFile << " , " << fragmentFile << "\n" << std::endl;
+	// Init vertScale if applicable
+	glUseProgram(ID);
+	GLuint uniID = glGetUniformLocation(ID, "vertScale");
+	if (uniID != -1)
+	{
+		glUniform1f(uniID, 0.0f);
+	}
 }
 
 // Activates the Shader Program
@@ -83,6 +93,11 @@ void Shader::setUniform1f(float value, const char* uniformName)
 	glUseProgram(ID);
 	// Assigns scale value
 	GLuint uniID = glGetUniformLocation(ID, uniformName);
+	if (uniID == -1)
+	{
+		std::cout << uniformName << " does not correspond to an active uniform variable in Shader Program " << ID << std::endl;
+		return;
+	}
 	glUniform1f(uniID, value);
 }
 
@@ -92,6 +107,11 @@ void Shader::setUniform2f(float value0, float value1, const char* uniformName)
 	glUseProgram(ID);
 	// Assigns scale value
 	GLuint uniID = glGetUniformLocation(ID, uniformName);
+	if (uniID == -1)
+	{
+		std::cout << uniformName << " does not correspond to an active uniform variable in Shader Program " << ID << std::endl;
+		return;
+	}
 	glUniform2f(uniID, value0, value1);
 }
 
@@ -101,14 +121,36 @@ void Shader::setUniform3f(float value0, float value1, float value2, const char* 
 	glUseProgram(ID);
 	// Assigns scale value
 	GLuint uniID = glGetUniformLocation(ID, uniformName);
+	if (uniID == -1)
+	{
+		std::cout << uniformName << " does not correspond to an active uniform variable in Shader Program " << ID << std::endl;
+		return;
+	}
 	glUniform3f(uniID, value0, value1, value2);
 }
 
+void Shader::setUniform4f(float value0, float value1, float value2, float value3, const char* uniformName)
+{
+	// Activates Shader Program
+	glUseProgram(ID);
+	// Assigns scale value
+	GLuint uniID = glGetUniformLocation(ID, uniformName);
+	if (uniID == -1)
+	{
+		std::cout << uniformName << " does not correspond to an active uniform variable in Shader Program " << ID << std::endl;
+		return;
+	}
+	//GLfloat vec[4] = { value0, value1, value2, value3 };
+	//glUniform4fv(uniID, 1, vec);
+	glUniform4f(uniID, value0, value1, value2, value3);
+}
+
 // checks if the different shaders have compiled properly
-void Shader::compileErrors(unsigned int shader, const char* type)
+bool Shader::compileErrors(unsigned int shader, const char* type)
 {
 	GLint hasCompiled;
 	char infoLog[1024];
+	bool hasError = false;
 	if (type != "PROGRAM")
 	{
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &hasCompiled);
@@ -116,7 +158,7 @@ void Shader::compileErrors(unsigned int shader, const char* type)
 		{
 			glGetShaderInfoLog(shader, 1024, NULL, infoLog);
 			std::cout << "SHADER_COMPILATION_ERROR for:" << type << "\n" << std::endl;
-
+			hasError = true;
 		}
 	}
 	else
@@ -126,6 +168,8 @@ void Shader::compileErrors(unsigned int shader, const char* type)
 		{
 			glGetProgramInfoLog(shader, 1024, NULL, infoLog);
 			std::cout << "SHADER_LINKING_ERROR for:" << type << "\n" << std::endl;
+			hasError = true;
 		}
 	}
+	return hasError;
 }

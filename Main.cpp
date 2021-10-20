@@ -11,11 +11,14 @@
 #include"EBO.h"
 #include"Texture.h"
 #include"Tests.h"
-
+#include"Fluid.h"
 
 int main()
 {
-	return testRun();
+	
+	//return testRun();
+	return fluidProto();
+
 }
 
 

@@ -72,16 +72,16 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Programming\FluidSimulation\Libraries\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Programming\FluidSimulation\Libraries\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\Libraries\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\Libraries\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Programming\FluidSimulation\Libraries\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Programming\FluidSimulation\Libraries\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\Libraries\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\Libraries\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -148,7 +148,9 @@
     <ClCompile Include="EBO.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="FluidProto.cpp" />
     <ClCompile Include="shaderClass.cpp" />
+    <ClCompile Include="Tests.cpp" />
     <ClCompile Include="stp.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="VAO.cpp" />
@@ -156,14 +158,24 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EBO.h" />
+    <ClInclude Include="Fluid.h" />
     <ClInclude Include="shaderClass.h" />
+    <ClInclude Include="Tests.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="VAO.h" />
     <ClInclude Include="VBO.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="addPropertyQuantity.frag" />
+    <None Include="advect.frag" />
     <None Include="default.frag" />
     <None Include="default.vert" />
+    <None Include="displayScalar.frag" />
+    <None Include="displayVector.frag" />
+    <None Include="divergence.frag" />
+    <None Include="GradientSubtract.frag" />
+    <None Include="JacobiPoisson.frag" />
+    <None Include="setBoundary.frag" />
     <None Include="TestRTT.frag" />
   </ItemGroup>
   <ItemGroup>

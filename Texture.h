@@ -14,6 +14,7 @@ class Texture
 		GLenum target;
 		GLenum slot;
 		GLenum pixelDataType;
+		GLenum pixelDataFormat;
 		unsigned int width;
 		unsigned int height;
 		Texture(int widthImg, int heightImg, GLenum texTarget, GLenum slot, GLenum format, GLenum sizedInternalFormat, GLenum pixelType);

@@ -29,6 +29,7 @@ Texture::Texture(int widthImg, int heightImg, GLenum texTarget, GLenum texSlot, 
 	slot = texSlot;
 	target = texTarget;
 	pixelDataType = pixelType;
+	pixelDataFormat = format;
 	width = widthImg;
 	height = heightImg;
 	// set number of color channel to 4
@@ -121,6 +122,11 @@ void Texture::texUnit(Shader &shader, const char* uniform, GLuint unit)
 {
 	// Gets the location of the uniform
 	GLuint tex0Uni = glGetUniformLocation(shader.ID, uniform);
+	if (tex0Uni == -1)
+	{
+		std::cout << uniform << " does not correspond to an active uniform variable in Shader Program " << shader.ID << std::endl;
+		return;
+	}
 	// Shader needs to be activated before changing the value of a uniform
 	shader.Activate();
 	// Sets the value of the uniform
@@ -149,6 +155,6 @@ void Texture::BulkImageReplace(void* newByteArray)
 {	// TODO: clean up
 	glActiveTexture(slot);
 	glBindTexture(target, ID);
-	glTexSubImage2D(target, 0, 0, 0, width, height, GL_RGBA, pixelDataType, newByteArray);
+	glTexSubImage2D(target, 0, 0, 0, width, height, pixelDataFormat, pixelDataType, newByteArray);
 	glBindTexture(target, 0);
 }

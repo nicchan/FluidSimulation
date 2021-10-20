@@ -45,6 +45,12 @@
     <ClCompile Include="Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FluidProto.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shaderClass.h">
@@ -62,6 +68,12 @@
     <ClInclude Include="EBO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Tests.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Fluid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="default.frag">
@@ -71,6 +83,30 @@
       <Filter>Resource Files\Shaders</Filter>
     </None>
     <None Include="TestRTT.frag">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="JacobiPoisson.frag">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="divergence.frag">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="GradientSubtract.frag">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="advect.frag">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="setBoundary.frag">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="displayScalar.frag">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="addPropertyQuantity.frag">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="displayVector.frag">
       <Filter>Resource Files\Shaders</Filter>
     </None>
   </ItemGroup>
